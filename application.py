@@ -5,6 +5,7 @@ from passlib.apps import custom_app_context as pwd_context
 from tempfile import mkdtemp
 import time
 from helpers import *
+import os
 
 # configure application
 app = Flask(__name__)
@@ -206,8 +207,8 @@ def register():
         if not request.form.get("password")==request.form.get("repeat"):
             return apology("Passwords don't match") 
         else:
-            hash= pwd_context.encrypt(request.form.get("repeat"))
-        result= db.execute("INSERT INTO users (username, hash) VALUES (:user, :hash)", user= request.form.get("user"), hash=pwd_context.encrypt(request.form.get("repeat")))
+            hash= pwd_context.hash(request.form.get("repeat"))
+        result= db.execute("INSERT INTO users (username, hash) VALUES (:user, :hash)", user= request.form.get("user"), hash=pwd_context.hash(request.form.get("repeat")))
         if result:
             return redirect(url_for("index", length=0))
         else:
@@ -252,5 +253,9 @@ def sell():
         return redirect(url_for("index")) 
     else:
         return render_template("sell.html")   
+        
+if __name__=="__main__":
+    port=int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
 
             
